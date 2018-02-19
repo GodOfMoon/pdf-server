@@ -10,6 +10,8 @@ how to use:
 
 > nodejs index.js
 *************************************************************************
-description
-this application for automaticly generate pdf for users with any requests, but you must have correct file with all coordinates where you want push lines of text
-you can test this app by hands, just follow http://<domainname/ip>:8080/
+# description
+
+This application for automaticly generate pdf for users with any requests, but you must have correct file with all coordinates where you want push lines of text.
+
+You can test this app by hands, just follow http://<domainname/ip>:8080/
