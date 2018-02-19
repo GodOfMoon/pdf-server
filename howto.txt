@@ -1,0 +1,11 @@
+sudo apt-get install nodejs
+sudo apt-get install npm
+sudo apt-get install node-gyp
+sudo apt-get install nodejs-legacy
+npm install qr-image
+npm install pdftk
+sudo apt-get install pdftk
+npm install hummus
+
+cd $PWD/pakt
+nodejs index.js
