@@ -7,6 +7,7 @@ var makepdf = require('./makepdf');
 class Line {
 	constructor(text, x, y, size, face) {
 		this.text = text;
+		this.color = 'black';
 	}
 	set x(value){
     	this.xValue = value;
@@ -23,6 +24,10 @@ class Line {
 	set text(value){
     	this.textValue = value;
 	}
+	set color(value){
+    	this.colorValue = value;
+	}
+	
 	get x(){
 		return `${this.xValue}`;
 	}
@@ -38,6 +43,9 @@ class Line {
 	get text(){
 		return `${this.textValue}`;
 	}
+	get color(){
+		return `${this.colorValue}`;
+	}
 };
 //function for download files from server
 function download(handle, response, post, pathname) {
@@ -47,7 +55,9 @@ function download(handle, response, post, pathname) {
 	if (pathname === '' || pathname === '/' || pathname === undefined)
 		pathname = '/html/index.html';
 	var filePath = '.' + pathname;
-
+	
+	var statusCode = ''; //http status code
+	
 	//check file extension & declare content type
 	var extname = path.extname(filePath);
 	var contentType = '';
@@ -65,33 +75,37 @@ function download(handle, response, post, pathname) {
 	//if file not exist
 	if (!fs.existsSync(filePath) || (contentType === '')){
 		console.log('Error. Cannot download file ' + pathname);
-		fs.readFile('./html/404.html', function(error, content) {
-			response.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+		filePath = './html/index.html';
+		contentType = 'text/html; charset=utf-8';
+		statusCode = 404;
+	}
+	//download file
+	if (contentType === 'application/pdf') {
+		var file = fs.createReadStream(filePath);
+		var stat = fs.statSync(filePath);
+		response.setHeader('Content-Length', stat.size);
+		response.setHeader('Content-Type', 'application/pdf');
+		response.setHeader('Content-Disposition', 'attachment; filename=output.pdf');
+		file.pipe(response);
+	} else {
+		fs.readFile(filePath, function(error, content) {
+			if (statusCode === '') {
+				statusCode = 200;
+			}
+			response.writeHead(statusCode, { 'Content-Type': contentType});
 			response.end(content, 'utf-8');
 		});
-	} else {
-		if (contentType === 'application/pdf') {
-			var file = fs.createReadStream(filePath);
-			var stat = fs.statSync(filePath);
-			response.setHeader('Content-Length', stat.size);
-			response.setHeader('Content-Type', 'application/pdf');
-			response.setHeader('Content-Disposition', 'attachment; filename=output.pdf');
-			file.pipe(response);
-		} else {
-			//upload file
-			fs.readFile(filePath, function(error, content) {
-				response.writeHead(200, { 'Content-Type': contentType});
-				response.end(content, 'utf-8');
-			});
-		}
-	}
+	}	
 }
 //request to make pdf from POST-data
 function make(handle, response, post) {
 	console.log('Request handler "make" was called.');
+	
 	var input = isJson(post.dt);
+	
 	var jsonFile = fs.readFileSync('json/coor.json', 'utf8');
-	var coor = JSON.parse(jsonFile);
+	var coor = isJson( JSON.parse(jsonFile) );
+	
 	if (input === false || coor === false) {
 		if (coor === false) {
 			console.log('Json from server is not valid');

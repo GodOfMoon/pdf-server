@@ -23,7 +23,7 @@ function touchpdf(lines, tmp, callback) {
 	for (var i in lines) {
 		if (lines[i].font === 'plain') lines[i].font = arialFont;
 		if (lines[i].font === 'bold') lines[i].font = arialFontbd;
-		cxt.writeText(lines[i].text, lines[i].x, lines[i].y, {font:lines[i].font,size:lines[i].size,color:'black'});
+		cxt.writeText(lines[i].text, lines[i].x, lines[i].y, {font:lines[i].font,size:lines[i].size,color:lines[i].color});
 	}
 	//close files
 	pageModifier.endContext().writePage();
